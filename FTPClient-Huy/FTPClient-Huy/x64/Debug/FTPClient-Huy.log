@@ -1,0 +1,7 @@
+﻿  Remove.cpp
+c:\users\huynx\desktop\ftp_v2\source_from_git\ftp\ftpclient-huy\ftpclient-huy\remove.cpp(36): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\users\huynx\desktop\ftp_v2\source_from_git\ftp\ftpclient-huy\ftpclient-huy\remove.cpp(61): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  EstablishDataChannel.cpp
+  Generating Code...
+  FTPClient-Huy.vcxproj -> C:\Users\huynx\Desktop\FTP_v2\source_from_git\FTP\FTPClient-Huy\x64\Debug\FTPClient-Huy.exe
+  FTPClient-Huy.vcxproj -> C:\Users\huynx\Desktop\FTP_v2\source_from_git\FTP\FTPClient-Huy\x64\Debug\FTPClient-Huy.pdb (Full PDB)
