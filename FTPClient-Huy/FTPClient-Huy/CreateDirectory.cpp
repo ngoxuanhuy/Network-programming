@@ -15,7 +15,7 @@ void CreateDirectory(SOCKET *controlConnectionSocket)
 	printf("Ten thu muc moi muon tao: ");
 	scanf("%s", &folderName);
 	
-	printf("Your name is: %s", folderName);
+	printf("new folder you want to create: %s", folderName);
 	
 
 	// Cau lenh tao thu muc
@@ -28,13 +28,13 @@ void CreateDirectory(SOCKET *controlConnectionSocket)
 	recvBufLength = recv(*controlConnectionSocket, recvBuffer, strlen(recvBuffer), 0);
 	if (strncmp(recvBuffer, "257", 3) == 0)
 	{
-		printf("Created new folder successfully");
+		printf("Created new folder successfully\n");
 		return;
 	}
 	// Neu thu muc da ton tai
 	if (strncmp(recvBuffer, "550", 3) == 0)
 	{
-		printf("Directory already exists");
+		printf("Directory already exists\n");
 		return;
 	}
 }

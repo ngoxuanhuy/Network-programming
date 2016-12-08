@@ -27,7 +27,7 @@ bool InitializeConnection(SOCKET* controlConnectSocket)
 		char buffer[512];
 		recvLength = recv(*controlConnectSocket, buffer, strlen(buffer), 0);
 		buffer[recvLength] = '\0';
-		printf("%s",buffer);
+		//printf("%s",buffer);
 		
 		/*for (int i = 0; i < 4; i++)
 		{

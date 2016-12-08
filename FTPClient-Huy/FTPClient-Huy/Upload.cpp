@@ -69,8 +69,9 @@ void Upload(SOCKET *controlConnectionSocket)
 			{
 				break;
 			}
-			send(dataSocket, sendBuffer, 1024, 0);
-			sentBytes += 1024;
+			send(dataSocket, sendBuffer, read, 0);
+			if (read < 1024)	// end of file
+				break;
 		}
 		printf("Uploading finished\n");
 		fclose(uploadFile);
@@ -81,5 +82,4 @@ void Upload(SOCKET *controlConnectionSocket)
 		recvBytes = recv(*controlConnectionSocket, recvAccept1, strlen(recvAccept1), 0);
 		recvAccept1[recvBytes] = '\0';
 	}
-	printf("%s", recvAccept);
 }

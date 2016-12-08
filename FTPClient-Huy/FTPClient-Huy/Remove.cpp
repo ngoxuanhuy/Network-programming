@@ -70,7 +70,7 @@ void Remove(SOCKET* controlConnectSocket)
 		}
 		else if (strncmp(recvBuffer, "550", 3) == 0)
 		{
-			printf("Folder not founnd!\n");
+			printf("Folder not founnd or may be it is not empty!\n");
 			return;
 		}
 		else

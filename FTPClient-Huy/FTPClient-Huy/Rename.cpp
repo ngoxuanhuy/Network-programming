@@ -6,15 +6,17 @@ void Rename(SOCKET* controlConnectSocket)
 {
 	char rnfrCommand[30];
 	char rntoCommand[30];
-	char oldName[60];
+	char oldName[60] = "";
 	char newName[60];
 
 	char recvBuffer[512];
 	int recvBytes;
-	system("cls");
+
 	Display(controlConnectSocket);
 
+	fflush(stdin);
 	printf("Type a filename you want to rename \n");
+	fflush(stdin);
 	scanf("%s", &oldName);
 
 	//RNFR <filename>
