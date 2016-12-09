@@ -147,8 +147,9 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChangeDirectory.h" />
     <ClInclude Include="CloseConnection.h" />
-    <ClInclude Include="CreateDirectory.h" />
+    <ClInclude Include="CreateNewDirectory.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="Download.h" />
     <ClInclude Include="EstablishDataChannel.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="InitializeConnection.h" />
     <ClInclude Include="Login.h" />
     <ClInclude Include="ParallelDownload.h" />
+    <ClInclude Include="PrintWorkingDirectory.h" />
     <ClInclude Include="Remove.h" />
     <ClInclude Include="Rename.h" />
     <ClInclude Include="stdafx.h" />
@@ -163,8 +165,9 @@
     <ClInclude Include="Upload.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ChangeDirectory.cpp" />
     <ClCompile Include="CloseConnection.cpp" />
-    <ClCompile Include="CreateDirectory.cpp" />
+    <ClCompile Include="CreateNewDirectory.cpp" />
     <ClCompile Include="Display.cpp" />
     <ClCompile Include="Download.cpp" />
     <ClCompile Include="EstablishDataChannel.cpp" />
@@ -173,6 +176,7 @@
     <ClCompile Include="Login.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ParallelDownload.cpp" />
+    <ClCompile Include="PrintWorkingDirectory.cpp" />
     <ClCompile Include="Remove.cpp" />
     <ClCompile Include="Rename.cpp" />
     <ClCompile Include="stdafx.cpp">

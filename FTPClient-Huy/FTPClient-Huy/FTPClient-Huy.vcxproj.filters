@@ -57,7 +57,13 @@
     <ClInclude Include="ParallelDownload.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CreateDirectory.h">
+    <ClInclude Include="ChangeDirectory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PrintWorkingDirectory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CreateNewDirectory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -101,7 +107,13 @@
     <ClCompile Include="ParallelDownload.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CreateDirectory.cpp">
+    <ClCompile Include="ChangeDirectory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrintWorkingDirectory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CreateNewDirectory.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
