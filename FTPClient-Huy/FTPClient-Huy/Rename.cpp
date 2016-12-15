@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Rename.h"
 #include "Display.h"
+#include <stdio.h>
 
 void Rename(SOCKET* controlConnectSocket)
 {
@@ -21,7 +22,6 @@ void Rename(SOCKET* controlConnectSocket)
 
 	//RNFR <filename>
 	sprintf(rnfrCommand, "RNFR %s\n", oldName);
-
 	//recvBytes = recv(*controlConnectSocket, recvBuffer, 512, 0);//---> doan nay la chua loi server gui 2 dong 226, 350
 
 	//gui ten file muon doi ten len server

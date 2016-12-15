@@ -18,7 +18,7 @@ char localPassword[100];
 int recvBytes;
 int ret;
 int fileSize;
-int numberOfStages, stageLength, finalStageLength;
+int numberOfSegments, segmentLength, finalSegmentLength;
 int contentLength;
 int newPosition[10];
 char *position;
@@ -29,7 +29,7 @@ SOCKET controlSocket[10];
 int length[10];
 SOCKET *currentControlSocket;
 
-FILE* downloadStage[10];
+FILE* segmentFiles[10];
 FILE* rootStage;
 
 HANDLE H[11];
@@ -38,19 +38,13 @@ bool AutoLoginAndDownload(int);
 
 void ParallelDownload(SOCKET *controlConnectionSocket, char *_username, char *_password)
 {
-	
+	fflush(stdin);
 	// Yêu cầu xem các tệp tin đang có
 	Display(controlConnectionSocket);
 
 	// Nhập tên tệp tin muốn tải
 	printf("Type the file's name you want to download: ");
 	scanf("%s", fileName);
-
-	// Cai dat cho tat ca cac socket dieu khien su kien ve gia tri mac dinh
-	for (int i = 1; i <= 5; i++)
-	{
-		closesocket(controlSocket[i]);
-	}
 
 	// Mở tệp tin gốc tổng hợp các phân mảnh
 	rootStage = fopen(fileName, "wb");
@@ -71,61 +65,50 @@ void ParallelDownload(SOCKET *controlConnectionSocket, char *_username, char *_p
 	strcpy(localPassword, _password);
 
 	// Số mảnh tệp tin bị chia
-	//printf("Number of stages: ");
-	//scanf("%d", &numberOfStages);
-	numberOfStages = 5;
+	numberOfSegments = 5;
 
-	if ((fileSize % numberOfStages) == 0)
+	if ((fileSize % numberOfSegments) == 0)
 	{
-		stageLength = fileSize / numberOfStages;
-		finalStageLength = stageLength;
+		segmentLength = fileSize / numberOfSegments;
+		finalSegmentLength = segmentLength;
 	}
 	else
 	{
-		stageLength = fileSize / numberOfStages + 1;
-		finalStageLength = fileSize - stageLength * (numberOfStages -1 );
+		segmentLength = fileSize / numberOfSegments + 1;
+		finalSegmentLength = fileSize - segmentLength * (numberOfSegments - 1);
 	}
 
 	// Tiến hành tải
 	printf("Downloading....\n");
 
-	// Voi i = numberOfStages => Thread chi thuc hien tu 1 den numberOfStages - 1 ????
-	for (int i = 1; i <= numberOfStages; i++)
+	for (int i = 1; i <= numberOfSegments; i++)
 	{
-		if (i != numberOfStages)
+		if (i != numberOfSegments)
 		{
-			length[i] = stageLength;
+			length[i] = segmentLength;
 		}
-		else 
+		else
 		{
-			length[i] = finalStageLength;
+			length[i] = finalSegmentLength;
 		}
 		H[i] = CreateThread(0, 0, StageThread, (char *)i, 0, 0);
-		
+
 	}
 
-	for (int i = 1; i <= numberOfStages; i++)
+	for (int i = 1; i <= numberOfSegments; i++)
 	{
 		WaitForSingleObject(H[i], INFINITE);
-		// Ghép dữ liệu vào tệp tin gốc
-		FILE *fread = fopen(fileNames[i], "rb");
-		while (fgets(line, sizeof(line), fread))
-		{
-			fputs(line, rootStage);
-		}
-		fclose(fread);
-		remove(fileNames[i]);
-		printf("Finish stage: %d\n", i);
-		//closesocket(controlSocket[i]);
 	}
+	printf("Download segments successful...\n");
+
+	_flushall();
+	// Tiến hành ghép nối các tệp tin
+	Merging();
 	fclose(rootStage);
 
-	printf("Download successfully...\n");
-	/*for (int i = 1; i <= numberOfStages; i++)
-	{
-		closesocket(controlSocket[i]);
-	}
-	return;*/
+	printf("Download totally success\n");
+
+	return;
 }
 
 DWORD WINAPI StageThread(LPVOID lpParameter)
@@ -142,7 +125,6 @@ DWORD WINAPI StageThread(LPVOID lpParameter)
 	{
 		check = AutoLoginAndDownload(index);
 	}
-	//AutoLoginAndDownload(index, contentLength);
 	return 0;
 }
 
@@ -159,13 +141,13 @@ void ChangeStartPosition(SOCKET controlConnectionSocket, int startPosition)
 
 	// Nhan phan hoi tu server tra ve
 	int recvBuf = recv(controlConnectionSocket, recvResponse, strlen(recvResponse), 0);
- 	recvResponse[recvBuf] = '\0';
+	recvResponse[recvBuf] = '\0';
 	return;
 }
 
 bool AutoLoginAndDownload(int index)
 {
-	InitializeConnection(controlSocket+index);
+	InitializeConnection(controlSocket + index);
 
 	char userCommand[35];
 	char passCommand[35];
@@ -176,14 +158,14 @@ bool AutoLoginAndDownload(int index)
 	unsigned long ul = 1;
 
 	sprintf(strIndex, "%d", index);
-	
+
 	//USER username
 	sprintf(userCommand, "USER %s\n", localUsername);
 
 	send(controlSocket[index], userCommand, strlen(userCommand), 0);
 
 	recvThread[index] = recv(controlSocket[index], recvBuffer, 512, 0);
-	if (recvBytes > 0)
+	if (recvThread[index] > 0)
 	{
 		recvBuffer[recvThread[index]] = '\0';
 
@@ -212,7 +194,7 @@ bool AutoLoginAndDownload(int index)
 		}
 
 		// Gửi lệnh REST để thay đổi điểm bắt đầu của con trỏ trên tệp cần tải phía server
-		newPosition[index] = (index - 1) * stageLength + 0;
+		newPosition[index] = (index - 1) * segmentLength + 0;
 		ChangeStartPosition(controlSocket[index], newPosition[index]);
 
 		//* Tạo socket của đường truyền dữ liệu
@@ -236,53 +218,76 @@ bool AutoLoginAndDownload(int index)
 
 			if (strncmp(recvBuffer, "150", 3) == 0)
 			{
-				// Tạo một tệp để lưu tạm dữ liệu của một phân mảnh: filename[1] = "1"
+				// Tạo một tệp tin tạm để lưu: filename[1] = "1"
 				strcpy(fileNames[index], strIndex);
 
-				// Mở tệp này ra để ghi dữ liệu
-				downloadStage[index] = fopen(fileNames[index], "wb");
+				// Mở tệp này để ghi dữ liệu
+				segmentFiles[index] = fopen(fileNames[index], "wb");
 
 				recvThread[index] = 0;
-				// Tiến hành tải dữ liệu của 1 phân mảnh,
-				// Ghi dữ liệu vào tệp vừa tạo
-				
+				/* Tiến hành tải dữ liệu của một phân mảnh,
+				Ghi vào tệp vừa tạo */
+
+				//Nếu độ dài của một phân mảnh < 1024 bytes...
 				if (length[index] < 1024)
 				{
+					// ... thì tải một lần là xong
 					recv(dataSocket[index], recvBuf[index], length[index], 0);
-					recvBuf[index][length[index] + 1] = '\0';
-					fwrite(recvBuf[index], 1, length[index], downloadStage[index]);
-					fclose(downloadStage[index]);
+					recvBuf[index][length[index]] = '\0';
+					fwrite(recvBuf[index], 1, length[index], segmentFiles[index]);
+					fclose(segmentFiles[index]);
 					break;
 				}
-				if (length[index] == 1024)
+				// ... hoặc độ dài của một phân mảnh = 1024 bytes...
+				else if (length[index] == 1024)
 				{
+					// ... thì cũng tải một lần là xong
 					recv(dataSocket[index], recvBuf[index], 1024, 0);
-					fwrite(recvBuf[index], 1, sizeof(recvBuf[index]), downloadStage[index]);
-					fclose(downloadStage[index]);
+					fwrite(recvBuf[index], 1, sizeof(recvBuf[index]), segmentFiles[index]);
+					fclose(segmentFiles[index]);
 				}
+				// ...nếu độ dài của một phân mảnh > 1024 bytes...
 				else
 				{
+					// .. thì tải làm nhiều lần
 					int reminder = length[index] % 1024;
 					int div = length[index] / 1024;
+
 					for (int i = 1; i <= div; i++)
 					{
 						recv(dataSocket[index], recvBuf[index], 1024, 0);
-						fwrite(recvBuf[index], 1, sizeof(recvBuf[index]), downloadStage[index]);
+						fwrite(recvBuf[index], 1, sizeof(recvBuf[index]), segmentFiles[index]);
 					}
+
 					recv(dataSocket[index], recvBuf[index], reminder, 0);
 					recvBuf[index][reminder] = '\0';
-					fwrite(recvBuf[index], 1, reminder, downloadStage[index]);
-					fclose(downloadStage[index]);	
+					fwrite(recvBuf[index], 1, reminder, segmentFiles[index]);
+					fclose(segmentFiles[index]);
 				}
 				break;
 			}
 		}
-		// Nhận kết quả phản hồi từ server: data transfer success
-		/*recvBytes = recv(controlSocket[index], recvBuffer, 512, 0);
-		closesocket(dataSocket[index]);
-		closesocket(controlSocket[index]);*/
 		return true;
 	}
 	return false;
 }
 
+void Merging()
+{
+	// Ghép dữ liệu vào tệp tin gốc
+	fflush(stdin);
+	for (int i = 1; i <= numberOfSegments; i++)
+	{
+		FILE *fread = fopen(fileNames[i], "rb");
+		while (fgets(line, sizeof(line), fread))
+		{
+			fputs(line, rootStage);
+		}
+		fclose(fread);
+		remove(fileNames[i]);
+		printf("Finish stage: %d\n", i);
+		closesocket(dataSocket[i]);
+		closesocket(controlSocket[i]);
+	}
+
+}

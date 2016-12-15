@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ChangeDirectory.h"
+#include "PrintWorkingDirectory.h"
 
 void ChangeDirectory(SOCKET *controlConnectionSocket)
 {
@@ -25,7 +26,8 @@ void ChangeDirectory(SOCKET *controlConnectionSocket)
 	}
 	else
 	{
-		printf("/%s: is current directory\n", pathName);
+		//printf("/%s: is current directory\n", pathName);
+		PrintWorkingDirectory(controlConnectionSocket, 0);
 	}
 	return;
 }

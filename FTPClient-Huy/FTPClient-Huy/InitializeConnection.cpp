@@ -27,18 +27,10 @@ bool InitializeConnection(SOCKET* controlConnectSocket)
 		char buffer[512];
 		recvLength = recv(*controlConnectSocket, buffer, strlen(buffer), 0);
 		buffer[recvLength] = '\0';
-		//printf("%s",buffer);
-		
-		/*for (int i = 0; i < 4; i++)
-		{
-			recvLength = recv(*controlConnectSocket, buffer, strlen(buffer), 0);
-			buffer[recvLength] = '\0';
-			printf("%s", buffer);
-		}*/
 	}
 	else
 	{
-		printf("Cannot connect to server!\n");
+		printf("Cannot connect to server, error: %d !\n",GetLastError());
 		return false;
 	}
 	return true;

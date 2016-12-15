@@ -9,6 +9,7 @@ void Download(SOCKET *controlConnectionSocket)
 	char retrCommand[100];
 	char sizeCommand[100];
 	char recvBuffer[1024];
+	char recvAccept[1024];
 	int recvBytes;
 	int ret;
 	int filesize;
@@ -40,6 +41,16 @@ void Download(SOCKET *controlConnectionSocket)
 	sprintf(retrCommand, "RETR %s\n", filename);
 	send(*controlConnectionSocket, retrCommand, strlen(retrCommand), 0);
 
+	// Nếu tệp tin không tồn tại, server trả về lệnh: "550 File not found"
+	recvBytes = recv(*controlConnectionSocket, recvAccept, strlen(recvAccept), 0);
+	recvAccept[recvBytes] = '\0';
+
+	if (strncmp(recvAccept, "550", 3) == 0) {
+		printf("File not found\n");
+		return;
+	}
+	
+	// Còn không thì sẽ nhận lệnh kết nối thành công: "150 Connection accepted"
 	recvBytes = 0;
 	FILE* downloadFile;
 	downloadFile = fopen(filename, "wb");
@@ -48,19 +59,36 @@ void Download(SOCKET *controlConnectionSocket)
 	fflush(stdin);
 
 	// Bat dau tai tep tin o day
-	while (recvBytes < filesize)
+	/*while (recvBytes < filesize)
 	{
 		recvBytes += recv(dataSocket, recvBuffer, 1024, 0);
 		fwrite(recvBuffer, 1, sizeof(recvBuffer), downloadFile);
+	}*/
+	while (true)
+	{
+		// read from socket
+		int r = recv(dataSocket, recvBuffer, 1024, 0);
+		if (r == -1)
+			break;
+
+		recvBytes += r;
+
+		// write to file
+		fwrite(recvBuffer, 1, r, downloadFile);
+
+		if (r < 1024)
+			break;
+
+		if (recvBytes >= filesize)
+			break;
 	}
 	fclose(downloadFile);
 	closesocket(dataSocket);
 
 	// Sau khi truyền kênh dữ liệu xong. Server lại gửi thông điệp xác nhân về kênh điều khiển
-	char recvAccept[1024];
-	//Receive response: Accep connection
+	//Receive response: "
 	recvBytes = recv(*controlConnectionSocket, recvAccept, strlen(recvAccept), 0);
 	recvAccept[recvBytes] = '\0';
-	printf("%s",recvAccept);
+	printf("Transfer OK");
 	
 }

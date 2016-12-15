@@ -36,6 +36,7 @@ int main(int argc, char* argv[])
 	int option;
 	do
 	{
+		Sleep(10);
 		printf("\t\t  ===================================== =====================================  \n");
 		printf("\t\t /                                                                           \\ \n");
 		printf("\t\t|           Select from 1 to 8         |               GROUP 7                |\n");
@@ -52,10 +53,9 @@ int main(int argc, char* argv[])
 			   "\t\t|   8.Remove                           |                                      | \n" 
 			   "\t\t|   9.Make directory                   |                                      | \n"
 			   "\t\t|   10.Quit                            |                                      | \n");
-		printf("\t\t\\                                                                            / \n");
+		printf("\t\t \\                                                                           / \n");
 		printf("\t\t  ===================================== =====================================   \n");
 
-		fflush(stdin);
 		scanf("%d", &option);
 
 		switch (option)
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 			Display(&controlConnectSocket);
 			break;
 		case 2:
-			PrintWorkingDirectory(&controlConnectSocket);
+			PrintWorkingDirectory(&controlConnectSocket,0);
 			break;
 		case 3:
 			ChangeDirectory(&controlConnectSocket);
@@ -86,6 +86,7 @@ int main(int argc, char* argv[])
 			break;
 		case 9:
 			CreateNewDirectory(&controlConnectSocket);
+			break;
 		default:
 			break;
 		}

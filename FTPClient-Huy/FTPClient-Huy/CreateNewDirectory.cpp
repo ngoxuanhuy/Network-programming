@@ -15,7 +15,7 @@ void CreateNewDirectory(SOCKET *controlConnectionSocket)
 	printf("Ten thu muc moi muon tao: ");
 	scanf("%s", &folderName);
 	
-	printf("new folder you want to create: %s", folderName);
+	printf("new folder you want to create: %s\n", folderName);
 	
 	// Cau lenh tao thu muc
 	sprintf(CreateCommand,"MKD %s\n",folderName);

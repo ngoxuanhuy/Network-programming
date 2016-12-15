@@ -27,7 +27,7 @@ void Upload(SOCKET *controlConnectionSocket)
 	scanf("%s", &filename);
 
 	//sprintf(filename, "\data\%s", userInput);
-	sprintf(pathName, "C:\\Users\\huynx\\Desktop\\FTP_v2\\source_from_git\\FTP\\FTPClient-Huy\\FTPClient-Huy\\File\\%s", filename);
+	sprintf(pathName, "C:\\Users\\huynx\\Desktop\\FTP_v2\\FTPClient-Huy\\FTPClient-Huy\\File\\%s", filename);
 	
 	FILE* uploadFile;
 	uploadFile = fopen(pathName, "rb");

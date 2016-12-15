@@ -1,4 +1,4 @@
 #pragma once
 #include <WinSock2.h>
 
-void PrintWorkingDirectory(SOCKET* );
+char *PrintWorkingDirectory(SOCKET*, int);
