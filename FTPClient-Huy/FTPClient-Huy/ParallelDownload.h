@@ -2,8 +2,6 @@
 #include <stdio.h>
 
 void ParallelDownload(SOCKET *controlConnectSocket, char *, char*);
-DWORD WINAPI StageThread(LPVOID lpParameter);
-void DownloadFinalStage();
-void Connecting();
-void ChangeStartPosition(SOCKET *controlConnectionSocket, int startPosition);
+DWORD WINAPI SegmentThread(LPVOID lpParameter);
 void Merging();
+void ChangeStartPosition(SOCKET controlConnectionSocket, int startPosition);

@@ -34,7 +34,7 @@ FILE* rootStage;
 
 HANDLE H[11];
 
-bool AutoLoginAndDownload(int);
+bool LoginAndDownloadAutomatic(int);
 
 void ParallelDownload(SOCKET *controlConnectionSocket, char *_username, char *_password)
 {
@@ -91,7 +91,7 @@ void ParallelDownload(SOCKET *controlConnectionSocket, char *_username, char *_p
 		{
 			length[i] = finalSegmentLength;
 		}
-		H[i] = CreateThread(0, 0, StageThread, (char *)i, 0, 0);
+		H[i] = CreateThread(0, 0, SegmentThread, (char *)i, 0, 0);
 
 	}
 
@@ -101,7 +101,6 @@ void ParallelDownload(SOCKET *controlConnectionSocket, char *_username, char *_p
 	}
 	printf("Download segments successful...\n");
 
-	_flushall();
 	// Tiến hành ghép nối các tệp tin
 	Merging();
 	fclose(rootStage);
@@ -111,7 +110,7 @@ void ParallelDownload(SOCKET *controlConnectionSocket, char *_username, char *_p
 	return;
 }
 
-DWORD WINAPI StageThread(LPVOID lpParameter)
+DWORD WINAPI SegmentThread(LPVOID lpParameter)
 {
 	int recvBytes = 0;
 	char recvBuf[1024];
@@ -123,29 +122,12 @@ DWORD WINAPI StageThread(LPVOID lpParameter)
 	//Neu dang nhap chua thanh cong => tiep tuc dang nhap lai
 	while (check == false)
 	{
-		check = AutoLoginAndDownload(index);
+		check = LoginAndDownloadAutomatic(index);
 	}
 	return 0;
 }
 
-void ChangeStartPosition(SOCKET controlConnectionSocket, int startPosition)
-{
-	char restCommand[100];
-	char recvResponse[100];
-
-	// Cau lenh thay doi vi tri con tro trong tep tin
-	sprintf(restCommand, "REST %d\n", startPosition);
-
-	// Gui lenh toi server
-	send(controlConnectionSocket, restCommand, strlen(restCommand), 0);
-
-	// Nhan phan hoi tu server tra ve
-	int recvBuf = recv(controlConnectionSocket, recvResponse, strlen(recvResponse), 0);
-	recvResponse[recvBuf] = '\0';
-	return;
-}
-
-bool AutoLoginAndDownload(int index)
+bool LoginAndDownloadAutomatic(int index)
 {
 	InitializeConnection(controlSocket + index);
 
@@ -271,6 +253,25 @@ bool AutoLoginAndDownload(int index)
 	}
 	return false;
 }
+
+void ChangeStartPosition(SOCKET controlConnectionSocket, int startPosition)
+{
+	char restCommand[100];
+	char recvResponse[100];
+
+	// Cau lenh thay doi vi tri con tro trong tep tin
+	sprintf(restCommand, "REST %d\n", startPosition);
+
+	// Gui lenh toi server
+	send(controlConnectionSocket, restCommand, strlen(restCommand), 0);
+
+	// Nhan phan hoi tu server tra ve
+	int recvBuf = recv(controlConnectionSocket, recvResponse, strlen(recvResponse), 0);
+	recvResponse[recvBuf] = '\0';
+	return;
+}
+
+
 
 void Merging()
 {
