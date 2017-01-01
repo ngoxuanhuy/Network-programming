@@ -3,11 +3,9 @@
 
 #include "stdafx.h"
 #include <WinSock2.h>
-#include <stdio.h>
 #include <Windows.h>
-
-DWORD WINAPI ClientThread(LPVOID lpParameter);
-WIN32_FIND_DATAA Data;
+#include <stdio.h>
+#include "ClientThread.h"
 
 int main()
 {
@@ -57,51 +55,4 @@ int main()
     return 0;
 }
 
-DWORD WINAPI ClientThread(LPVOID lpParameter)
-{
-	SOCKET clientSocket = *(SOCKET *)lpParameter;
-	char recvBuf[512], sendBuf[4086];
-	int recvBufLen, sendBufLen;
 
-	// Server receive request from browser
-	recvBufLen = recv(clientSocket, recvBuf, strlen(recvBuf), 0);
-	recvBuf[recvBufLen] = '\0';
-	printf("%s\n\n", recvBuf[recvBufLen]);
-
-	/* ====================================== 
-		Get the path from browser's request
-	    Ex: Get /ngoxuanhuy HTTP/1.1
-	    => token = /ngoxuanhuy
-	   ===================================== */
-	if (strncmp(recvBuf, "GET", 3) == 0)
-	{
-		char *token = strtok(recvBuf, " ");
-		token = strtok(NULL, " ");
-		printf("%s\n", token);
-
-		
-		strcpy(sendBuf, "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\n\r\n");
-		strcat(sendBuf, "<html><body>");
-
-		HANDLE h = FindFirstFileA("D:\\ngoxuanhuy\\*.*", &Data);
-		do {
-			if (Data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-			{
-				strcat(sendBuf, "<a href=\"#\" style=\"text-decoration: none; color: #00695C\"><b>");
-				strcat(sendBuf, Data.cFileName);
-				strcat(sendBuf, "</b></a><br/>");
-			}
-			else
-			{
-				printf("Dont");
-				strcat(sendBuf, "<a href=\"#\" style=\"text-decoration: none; color: #F50057\"><i>");
-				strcat(sendBuf, Data.cFileName);
-				strcat(sendBuf, "</i></a><br/>");
-			}
-		} while (FindNextFileA(h, &Data));
-
-		strcat(sendBuf, "</body></html>");
-		send(clientSocket, sendBuf, strlen(sendBuf), 0);
-	}
-	closesocket(clientSocket);
-}
