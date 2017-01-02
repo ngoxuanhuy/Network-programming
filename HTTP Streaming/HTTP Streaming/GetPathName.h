@@ -2,4 +2,4 @@
 #include "stdafx.h"
 #include <WinSock2.h>
 
-char * GetPathName(char *);
+char * GetPathName(char *, SOCKET *);

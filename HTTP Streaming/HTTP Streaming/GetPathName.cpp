@@ -2,9 +2,9 @@
 #include "GetPathName.h"
 #include <string.h>
 
-char *GetPathName(char * recvBuf)
+char *GetPathName(char * recvBuf, SOCKET *clientSocket)
 {
-	char pathName[512] = "C:\\";
+	char pathName[512] = "C:";
 
 	char *token = strtok(recvBuf, "/");
 

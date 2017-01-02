@@ -147,12 +147,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ClientThread.h" />
+    <ClInclude Include="GetFileName.h" />
     <ClInclude Include="GetPathName.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClientThread.cpp" />
+    <ClCompile Include="GetFileName.cpp" />
     <ClCompile Include="GetPathName.cpp" />
     <ClCompile Include="HTTP Streaming.cpp" />
     <ClCompile Include="stdafx.cpp">
